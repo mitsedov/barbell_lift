@@ -1,0 +1,97 @@
+
+# Predicting Exercise Manner
+## August 24, 2014
+
+### Introduction
+
+Using devices that measure characterisitcs of our physical activities opens a great variety of applications in health and sports industries. One of such applications is the opportunity to identify, how well a person is performing exercises using accelerometer data from one of such devices. However, identifying the particular pattern in exercise execution and predicting whether this pattern signals for right or wrong excercise manner is a complex machine learning problem.
+
+In this report we use Weight Lifiting Exercise Dataset from Groupware@LES to offer a possible solution to this problem. The data comes from the experiment, in which the enthusiasts were asked to perform barbell lifting in different (correct and incorrect ways). The dataset consists of body activity measurements related to barbell lifting and variable ```classe``` which denotes one of the six possible exercise patterns.
+
+The aim of this report is to build a classifier, which predicts the execrise pattern (as in ```classe``` variable) based on the activity measurements related to barbell lifting. The classifier is built on the training data provided by Coursera and then predictions for the test set (also provided by Coursera) are made.
+
+### Data Preprocessing
+
+We first download both the training and test data and read it into R:
+
+```{r cache = TRUE}
+trainURL <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+testURL <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+download.file(trainURL, destfile = "pml-training.csv", method = "curl")
+download.file(testURL, destfile = "pml-testing.csv", method = "curl")
+train_raw <- read.csv("pml-training.csv", na.strings = "NA", header = T)
+finalTest_raw <- read.csv("pml-testing.csv", na.strings = "NA", header = T)
+```
+
+Taking a quick look at the data and reading the [original paper](http://groupware.les.inf.puc-rio.br/public/papers/2013.Velloso.QAR-WLE.pdf) about the data it is easy to note that the measurements on mean, variance, standard deviation, max, min, amplitude, kurtosis and skewness are calculated only when a new time window begins (```new_window``` ```== "yes"```). 
+
+There are no such (```new_window``` ```== "yes"```) observations in the test dataset. Moreover, these measures can not be calculated ``on the fly'' during the exercise. Thus the classifier to be built can not rely on the variables related to mean, variance, standard deviation, max, min, amplitude, kurtosis and skewness. We remove these variables from both the training and the testing datasets:
+
+```{r}
+exclude <- grep("^avg|^var|^stddev|^max|^min|^amplitude|^kurtosis|^skewness", names(train_raw))
+train <- train_raw[,-exclude]
+finalTest <- finalTest_raw[,-exclude]
+```
+
+Is is also reasonable to exclude the variable ```X,``` the first column, which is simply the row number and should not content any information relevant for prediction. 
+```{r}
+train <- train[,-c(1)]
+finalTest <- finalTest[,-c(1)]
+```
+
+Now it is time to divide the training dataset provided by Coursera into two parts: the actual training dataset that will be used to fit the model and the validation dataset to estimate the out of sample error. In order to reduce the computation time while fitting the model, only 1/5 of the data is included into ```training``` part, while 4/5 are left for ```validation.```
+```{r}
+library(caret)
+inTrain <- createDataPartition(train$classe, p=0.2, list = F)
+training <- train[inTrain,]
+validation <- train[-inTrain,]
+```
+
+### Model
+
+We chose one of the boosting [with trees] methods mentioned in Coursera lecture, Generalized Boosted Regression Model, implemented in ```gbm``` package, as the classification approach. The general approach is to compute a sequence of simple trees, where each next tree is constructed for the residuals of the previous tree. The method is generalized in ```gbm``` package for classifiaction problems. After experimenting with a number of other algorithms, we found ```gbm``` approach the most successful.
+
+5-fold cross-validation is used to estimate the out-of-sample error.
+
+```{r}
+control <- trainControl(method = "cv", number = 5)
+fit <- train(classe ~ ., data=training, method = "gbm", verbose = FALSE, trControl = control)
+fit
+```
+
+We can see that the accuracy of the model with cross-validation as training control is essentially 1. We should thus expect quite low out-of-sample error, which is further explore in the next section.
+
+### Validation & Error Estimation
+
+We should verify the results of the model, again using the technique of cross-validation. Part of the training data was left untouched specifically for this purpose and we can now again estimate out-of-sample error.
+
+First, we build predictions for the ```validataion``` dataset.
+
+```{r}
+predictions <- predict(fit,newdata=validation)
+```
+
+We then build the confusion matrix, comparing our predictions with the actual classes on the ```validation``` dataset:
+
+```{r}
+confusionMatrix(predictions, validation$classe)
+```
+
+**It is easy to see that the model is quite accurate with 95% confidence interval being (0.999, 1).** This speaks in favour of low out-of-sample error, which is expected to be lower than 0.1%.
+
+### Prediction 
+
+As the final test of our model, we build prediction oт the testing set provided by Coursera. 
+
+```{r}
+finalPredictions <- predict(fit, newdata = finalTest)
+finalPredictions
+```
+
+It is necessary to mention that all of the predictions appeared to be correct as determined after submission to Coursera.
+
+### Conclusion
+
+In this report a machine learing algorithm (Generalized Boosted Regression Model) was used to build a classifier for barbell lifting patterns. An impressive accuracy, lying in (0.999, 1) with 95% confidence was achieved under cross-validation.
+
+The accuracy of the prediction methods implemented in ```gbm```package helped to build a classifier for this report and showed the potential to use machine learning algorithms for exercise pattern determination and possible assistance for sportsmen.
