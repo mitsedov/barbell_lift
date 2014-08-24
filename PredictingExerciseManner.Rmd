@@ -54,6 +54,7 @@ We chose one of the boosting [with trees] methods mentioned in Coursera lecture,
 5-fold cross-validation is used to estimate the out-of-sample error.
 
 ```{r}
+set.seed(1)
 control <- trainControl(method = "cv", number = 5)
 fit <- train(classe ~ ., data=training, method = "gbm", verbose = FALSE, trControl = control)
 fit
@@ -77,7 +78,7 @@ We then build the confusion matrix, comparing our predictions with the actual cl
 confusionMatrix(predictions, validation$classe)
 ```
 
-**It is easy to see that the model is quite accurate with 95% confidence interval being (0.999, 1).** This speaks in favour of low out-of-sample error, which is expected to be lower than 0.1%.
+**It is easy to see that the model is quite accurate with 95% confidence interval being (0.992, 0.994).** This speaks in favour of low out-of-sample error, which is expected to be lower than 1%.
 
 ### Prediction 
 
@@ -92,6 +93,6 @@ It is necessary to mention that all of the predictions appeared to be correct as
 
 ### Conclusion
 
-In this report a machine learing algorithm (Generalized Boosted Regression Model) was used to build a classifier for barbell lifting patterns. An impressive accuracy, lying in (0.999, 1) with 95% confidence was achieved under cross-validation.
+In this report a machine learing algorithm (Generalized Boosted Regression Model) was used to build a classifier for barbell lifting patterns. An impressive accuracy lying in (0.992, 0.994) with 95% confidence was achieved under cross-validation.
 
 The accuracy of the prediction methods implemented in ```gbm```package helped to build a classifier for this report and showed the potential to use machine learning algorithms for exercise pattern determination and possible assistance for sportsmen.

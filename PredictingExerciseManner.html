@@ -240,7 +240,8 @@ validation &lt;- train[-inTrain,]
 
 <p>5-fold cross-validation is used to estimate the out-of-sample error.</p>
 
-<pre><code class="r">control &lt;- trainControl(method = &quot;cv&quot;, number = 5)
+<pre><code class="r">set.seed(1)
+control &lt;- trainControl(method = &quot;cv&quot;, number = 5)
 fit &lt;- train(classe ~ ., data=training, method = &quot;gbm&quot;, verbose = FALSE, trControl = control)
 fit
 </code></pre>
@@ -254,20 +255,20 @@ fit
 ## No pre-processing
 ## Resampling: Cross-Validated (5 fold) 
 ## 
-## Summary of sample sizes: 3140, 3142, 3141, 3142, 3143 
+## Summary of sample sizes: 3142, 3140, 3142, 3142, 3142 
 ## 
 ## Resampling results across tuning parameters:
 ## 
 ##   interaction.depth  n.trees  Accuracy  Kappa  Accuracy SD  Kappa SD
-##   1                   50      0.8       0.8    0.024        0.030   
-##   1                  100      0.9       0.9    0.015        0.019   
-##   1                  150      0.9       0.9    0.012        0.015   
-##   2                   50      1.0       0.9    0.012        0.015   
-##   2                  100      1.0       1.0    0.004        0.005   
-##   2                  150      1.0       1.0    0.002        0.003   
-##   3                   50      1.0       1.0    0.006        0.008   
-##   3                  100      1.0       1.0    0.002        0.003   
-##   3                  150      1.0       1.0    0.002        0.003   
+##   1                   50      0.8       0.8    0.015        0.019   
+##   1                  100      0.9       0.9    0.008        0.010   
+##   1                  150      0.9       0.9    0.009        0.011   
+##   2                   50      1.0       0.9    0.007        0.009   
+##   2                  100      1.0       1.0    0.006        0.008   
+##   2                  150      1.0       1.0    0.003        0.004   
+##   3                   50      1.0       1.0    0.007        0.008   
+##   3                  100      1.0       1.0    0.003        0.004   
+##   3                  150      1.0       1.0    0.003        0.004   
 ## 
 ## Tuning parameter &#39;shrinkage&#39; was held constant at a value of 0.1
 ## Accuracy was used to select the optimal model using  the largest value.
@@ -295,36 +296,36 @@ fit
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 4448    2    0    0    0
-##          B   16 3018   14    0    4
-##          C    0    6 2709   17    0
-##          D    0   11   14 2544   12
-##          E    0    0    0   11 2869
+##          A 4438   13    0    0    0
+##          B   26 3018    2    0    5
+##          C    0    6 2711   17    0
+##          D    0    0   24 2546   20
+##          E    0    0    0    9 2860
 ## 
 ## Overall Statistics
 ##                                         
-##                Accuracy : 0.993         
-##                  95% CI : (0.992, 0.994)
+##                Accuracy : 0.992         
+##                  95% CI : (0.991, 0.994)
 ##     No Information Rate : 0.284         
 ##     P-Value [Acc &gt; NIR] : &lt;2e-16        
 ##                                         
-##                   Kappa : 0.991         
+##                   Kappa : 0.99          
 ##  Mcnemar&#39;s Test P-Value : NA            
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity             0.996    0.994    0.990    0.989    0.994
-## Specificity             1.000    0.997    0.998    0.997    0.999
-## Pos Pred Value          1.000    0.989    0.992    0.986    0.996
-## Neg Pred Value          0.999    0.998    0.998    0.998    0.999
+## Sensitivity             0.994    0.994    0.991    0.990    0.991
+## Specificity             0.999    0.997    0.998    0.997    0.999
+## Pos Pred Value          0.997    0.989    0.992    0.983    0.997
+## Neg Pred Value          0.998    0.998    0.998    0.998    0.998
 ## Prevalence              0.284    0.194    0.174    0.164    0.184
-## Detection Rate          0.283    0.192    0.173    0.162    0.183
-## Detection Prevalence    0.284    0.194    0.174    0.164    0.183
-## Balanced Accuracy       0.998    0.996    0.994    0.993    0.997
+## Detection Rate          0.283    0.192    0.173    0.162    0.182
+## Detection Prevalence    0.284    0.194    0.174    0.165    0.183
+## Balanced Accuracy       0.997    0.996    0.994    0.993    0.995
 </code></pre>
 
-<p><strong>It is easy to see that the model is quite accurate with 95% confidence interval being (0.999, 1).</strong> This speaks in favour of low out-of-sample error, which is expected to be lower than 0.1%.</p>
+<p><strong>It is easy to see that the model is quite accurate with 95% confidence interval being (0.991, 0.994).</strong> This speaks in favour of low out-of-sample error, which is expected to be lower than 1%.</p>
 
 <h3>Prediction</h3>
 
@@ -342,7 +343,7 @@ finalPredictions
 
 <h3>Conclusion</h3>
 
-<p>In this report a machine learing algorithm (Generalized Boosted Regression Model) was used to build a classifier for barbell lifting patterns. An impressive accuracy, lying in (0.999, 1) with 95% confidence was achieved under cross-validation.</p>
+<p>In this report a machine learing algorithm (Generalized Boosted Regression Model) was used to build a classifier for barbell lifting patterns. An impressive accuracy lying in (0.991, 0.994) with 95% confidence was achieved under cross-validation.</p>
 
 <p>The accuracy of the prediction methods implemented in <code>gbm</code>package helped to build a classifier for this report and showed the potential to use machine learning algorithms for exercise pattern determination and possible assistance for sportsmen.</p>
 
